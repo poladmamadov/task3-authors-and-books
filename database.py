@@ -3,9 +3,9 @@ import oracledb
 
 def get_connection():
     return oracledb.connect(
-        user = "C##POLAD",
-        password = "polad55",
-        dsn = "localhost:1521/xe"
+        user = "",
+        password = "",
+        dsn = ""
     )
 
 
