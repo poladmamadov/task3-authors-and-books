@@ -1,4 +1,4 @@
-from database import create_tables
+from database import create_tables, get_connection
 from insert import add_author, add_book
 
 create_tables()
@@ -8,7 +8,9 @@ def querry():
         print("\n--- Kitab və Müəllif İdarəetmə Sistemi ---")
         print("1. Müəllif əlavə et")
         print("2. Kitab əlavə et")
-        print("3. Çıxış")
+        print("3. Müəllifləri və kitablarını göstər")
+        print("4. Müəlliflərin kitab sayını göstər")
+        print("0. Çıxış")
 
         choice = input("Seçim: ")
 
@@ -30,7 +32,40 @@ def querry():
             except ValueError:
                 print("Xəta: Müəllif ID-rəqəm olmalıdır!")
         
+
+
         elif choice == "3":
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT a.name, b.book_name
+                FROM authors a
+                LEFT JOIN books b ON a.id = b.author_id
+                ORDER BY a.name
+            """)
+            print("\n--- Müəllif və Kitabları ---")
+            for row in cursor:
+                print(f"Müəllif: {row[0]}, Kitab: {row[1] if row[1] else 'Kitab yoxdur'}")
+            cursor.close()
+            conn.close()
+
+        elif choice == "4":
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT a.name, COUNT(b.id) AS kitab_sayi
+                FROM authors a
+                LEFT JOIN books b ON a.id = b.author_id
+                GROUP BY a.name
+                ORDER BY kitab_sayi DESC
+            """)
+            print("\n--- Müəlliflərin Kitab Sayı ---")
+            for row in cursor:
+                print(f"Müəllif: {row[0]}, Kitab sayı: {row[1]}")
+            cursor.close()
+            conn.close()
+        
+        elif choice == "0":
             print("Çıxış edilir...")
             break
 
